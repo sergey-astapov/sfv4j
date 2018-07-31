@@ -28,18 +28,20 @@ allprojects {
 
     def scalaMajor = '2.12'
     def scalaMinor = '4'
+    def validationVersion = '2.0.0.Final'
+    def hibernateVersion = '6.0.7.Final'
     def logbackVersion = '1.1.7'
     def slf4jVersion = '1.7.22'
 
     dependencies {
         compile(
                 "org.scala-lang:scala-library:$scalaMajor.$scalaMinor",
+                "javax.validation:validation-api:$validationVersion",
+                "org.hibernate.validator:hibernate-validator:$hibernateVersion",
+                "org.glassfish:javax.el:3.0.1-b08",
                 "ch.qos.logback:logback-core:$logbackVersion",
                 "ch.qos.logback:logback-classic:$logbackVersion",
-                "org.slf4j:slf4j-api:$slf4jVersion",
-                "com.softwaremill.macwire:proxy_$scalaMajor:2.3.0",
-                "ru.yandex.qatools:yatomata:1.7",
-                "com.roundeights:hasher_$scalaMajor:1.2.0"
+                "org.slf4j:slf4j-api:$slf4jVersion"
         )
 
         testCompile(
