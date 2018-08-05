@@ -10,9 +10,9 @@ import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-@Target( { METHOD, FIELD, ANNOTATION_TYPE })
+@Target({METHOD, FIELD, ANNOTATION_TYPE})
 @Retention(RUNTIME)
-@Constraint(validatedBy = Sfv4jValidator.class)
+@Constraint(validatedBy = Sfv4jConstraintValidator.class)
 @Documented
 public @interface Sfv4j {
 

@@ -2,18 +2,21 @@ package org.sfv4j;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
-
 import java.util.Set;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
-public class Sfv4jTest {
+public class Sfv4jConstraintValidatorTest {
+    private static final Logger LOG = LoggerFactory.getLogger(Sfv4jConstraintValidatorTest.class);
+
     private static Validator validator;
 
     @BeforeClass
@@ -22,18 +25,11 @@ public class Sfv4jTest {
         validator = factory.getValidator();
     }
 
-    public static class TestField {
-        @Sfv4j("?(10n)")
-        private final String field;
-
-        public TestField(String field) {
-            this.field = field;
-        }
-    }
-
     @Test
     public void test() {
         Set<ConstraintViolation<TestField>> set = validator.validate(new TestField(null));
+        set.forEach(v -> LOG.info(v.toString()));
+
         assertThat(set.size(), is(0));
     }
 }
