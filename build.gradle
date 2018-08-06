@@ -21,13 +21,12 @@ allprojects {
     apply plugin: 'java'
     apply plugin: 'application'
 
-//    mainClassName = ""
-
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
 
     def scalaMajor = '2.12'
     def scalaMinor = '4'
+    def scalaCombVersion = '1.1.1'
     def validationVersion = '2.0.0.Final'
     def hibernateVersion = '6.0.7.Final'
     def logbackVersion = '1.1.7'
@@ -36,6 +35,7 @@ allprojects {
     dependencies {
         compile(
                 "org.scala-lang:scala-library:$scalaMajor.$scalaMinor",
+                "org.scala-lang.modules:scala-parser-combinators_$scalaMajor:$scalaCombVersion",
                 "javax.validation:validation-api:$validationVersion",
                 "org.hibernate.validator:hibernate-validator:$hibernateVersion",
                 "org.glassfish:javax.el:3.0.1-b08",
