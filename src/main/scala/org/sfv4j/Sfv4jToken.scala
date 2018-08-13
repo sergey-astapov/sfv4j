@@ -6,9 +6,11 @@ sealed abstract trait Sfv4jToken extends Positional
 
 case class LengthToken(value: Int) extends Sfv4jToken
 
-case object FixLengthToken extends Sfv4jToken
-case object RangeLengthToken extends Sfv4jToken
-case object MultiLineToken extends Sfv4jToken
+sealed abstract trait LengthRestrictionToken extends Sfv4jToken
+
+case object FixLengthToken extends LengthRestrictionToken
+case object RangeLengthToken extends LengthRestrictionToken
+case object MultiLineToken extends LengthRestrictionToken
 
 case class DateToken(value: Int) extends Sfv4jToken
 
