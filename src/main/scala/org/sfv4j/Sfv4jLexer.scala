@@ -1,7 +1,5 @@
 package org.sfv4j
 
-import org.sfv4j.Sfv4jError.{LexerError, Location}
-
 import scala.util.parsing.combinator.RegexParsers
 
 object Sfv4jLexer extends RegexParsers {

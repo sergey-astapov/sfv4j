@@ -1,7 +1,5 @@
 package org.sfv4j
 
-import org.sfv4j.Sfv4jError.ParserError
-
 import scala.util.parsing.combinator.Parsers
 import scala.util.parsing.input.{NoPosition, Position, Reader}
 
@@ -13,24 +11,56 @@ object Sfv4jRuleParser extends Parsers {
   }
 
   def block: Parser[Sfv4jRule] = {
-    rep1(fixLength | rangeLength) ^^ {
+    rep1(date |
+      fixLength | rangeLength | multiLine | maxLength |
+      numericDigit | alphaLetter | anyLetter | hexLetter |
+      swiftChar | edifactChar | infoServiceChar |
+      optional | empty) ^^ {
       stmtList => stmtList reduceRight AndThenRule
     }
   }
 
-  def length: Parser[LengthToken] = accept("length", {
-    case lt@LengthToken(_) => lt
+  private def dateToken = accept("date", {
+    case dt @ DateToken(_) => dt
   })
 
-  private def fixLength =
-    (length ~ FixLengthToken ~ NumericDigitToken) ^^ {
-      case lt ~ _ ~ _ => CharRule(FixLengthRestriction(lt.value), NumericDigitType)
-    }
+  private def date = dateToken ^^ (dt => DateRule(dt.value))
 
-  private def rangeLength =
-    (length ~ FixLengthToken ~ NumericDigitToken) ^^ {
-      case lt ~ _ ~ _ => CharRule(FixLengthRestriction(lt.value), NumericDigitType)
-    }
+  private def lengthToken = accept("length", {
+    case lt @ LengthToken(_) => lt
+  })
+
+  private def maxLength = lengthToken ^^ (lt => MaxLengthRule(lt.value))
+
+  private def fixLength = (lengthToken ~ FixLengthToken) ^^ {
+    case lt ~ _ => FixLengthRule(lt.value)
+  }
+
+  private def rangeLength = (lengthToken ~ RangeLengthToken ~ lengthToken) ^^ {
+    case lt1 ~ _ ~ lt2 => RangeLengthRule(lt1.value, lt2.value)
+  }
+
+  private def multiLine = (lengthToken ~ MultiLineToken ~ lengthToken) ^^ {
+    case lt1 ~ _ ~ lt2 => MultiLineRule(lt1.value, lt2.value)
+  }
+
+  private def numericDigit = NumericDigitToken ^^ (_ => NumericDigitRule)
+
+  private def alphaLetter = AlphaLetterToken ^^ (_ => AlphaLetterRule)
+
+  private def anyLetter = AlphaLetterToken ^^ (_ => AlphaLetterRule)
+
+  private def hexLetter = HexLetterToken ^^ (_ => HexLetterRule)
+
+  private def swiftChar = SwiftCharToken ^^ (_ => SwiftCharRule)
+
+  private def edifactChar = EdifactCharToken ^^ (_ => EdifactCharRule)
+
+  private def infoServiceChar = InfoServiceCharToken ^^ (_ => InfoServiceCharRule)
+
+  private def optional = OptionalToken ^^ (_ => OptionalRule)
+
+  private def empty = EmptyToken ^^ (_ => EmptyRule)
 
   def apply(tokens: Seq[Elem]): Either[ParserError, Sfv4jRule] = {
     val reader = new Sfv4jTokenReader(tokens)

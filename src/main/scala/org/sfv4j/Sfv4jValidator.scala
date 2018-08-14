@@ -2,25 +2,25 @@ package org.sfv4j
 
 import java.lang.reflect.Field
 
-import org.slf4j.LoggerFactory
+sealed trait Sfv4jResult {
+  def isSuccess: java.lang.Boolean = this == Sfv4jSuccess
+}
 
-import scala.util.Try
+case object Sfv4jSuccess extends Sfv4jResult
+
+case class Sfv4jFailure(msg: String) extends Sfv4jResult
 
 class Sfv4jValidator {
-  private val LOG = LoggerFactory.getLogger(classOf[Sfv4jValidator])
-
-  def validate(obj: Any): Try[java.lang.Boolean] = Try {
-    val objectClass = obj.getClass
-    val map = objectClass.getDeclaredFields
+  def validate(obj: Any): Sfv4jResult = {
+    val errors = obj.getClass.getDeclaredFields
       .map(f => {
         f.setAccessible(true)
         f
       })
       .filter(f => f.isAnnotationPresent(classOf[Sfv4j]))
-      .map(f => (key(f), f.get(obj)))
-      .toMap
-    LOG.info("map: {}", map)
-    true
+      .map(f => Sfv4jCompiler(key(f)).flatMap(r => r.validate(f.get(obj))))
+      .flatMap(_.left.toOption).toList
+    if (errors.isEmpty) Sfv4jSuccess else Sfv4jFailure(errors.reduce((e1, e2) => e1 + e2).toString)
   }
 
   private def key(field: Field) = {

@@ -1,7 +1,6 @@
 package org.sfv4j
 
 import org.scalatest.FunSuite
-import org.sfv4j.Sfv4jError.{LexerError, Location}
 
 class Sfv4jLexerTest extends FunSuite {
   test("Up to 2 digits") {

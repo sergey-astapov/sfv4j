@@ -1,33 +1,84 @@
 package org.sfv4j
 
-sealed trait Sfv4jRule
+import scala.util.Try
 
-case class AndThenRule(rule1: Sfv4jRule, rule2: Sfv4jRule) extends Sfv4jRule
+sealed trait Sfv4jRule {
+  type Result = Either[Sfv4jError, Boolean]
 
-case class DateRule(value: Int) extends Sfv4jRule
+  def validate(obj: Any): Result = validateStr(obj)(filter)
 
-sealed trait LengthRestriction
+  def filter: (String => Boolean) = s => true
 
-case class MaxLengthRestriction(max: Int) extends LengthRestriction
+  private def validateStr(obj: Any): (String => Boolean) => Result = f =>
+    Option(obj).map(_.toString) match {
+      case Some(s) if f(s) => Right(true)
+      case opt => Left(ValidationError(s"$this failed, arg: ${opt.orNull}"))
+    }
+}
 
-case class RangeLengthRestriction(min: Int, max: Int) extends LengthRestriction
+case class AndThenRule(r1: Sfv4jRule, r2: Sfv4jRule) extends Sfv4jRule {
+  override def validate(obj: Any): Result = (r1.validate(obj), r2.validate(obj)) match {
+    case (Right(true), Right(true)) => Right(true)
+    case (Left(e1), Left(e2)) => Left(e1 + e2)
+    case (Left(e), _) => Left(e)
+    case (_, Left(e)) => Left(e)
+    case p => Left(ValidationError(s"Unsupported: $p"))
+  }
+}
 
-case class FixLengthRestriction(length: Int) extends LengthRestriction
+case class DateRule(value: Int) extends Sfv4jRule {
+  override def filter: String => Boolean = s => s.length == value
+}
 
-case class MultiLineRestriction(lines: Int, length: Int) extends LengthRestriction
+case class MaxLengthRule(max: Int) extends Sfv4jRule {
+  override def filter: String => Boolean = s => s.length <= max
+}
 
-sealed trait CharType
+case class RangeLengthRule(min: Int, max: Int) extends Sfv4jRule {
+  override def filter: String => Boolean = s => s.length >= min && s.length <= max
+}
 
-case object NumericDigitType extends CharType
-case object AlphaLetterType extends CharType
-case object AnyLetterType extends CharType
-case object HexLetterType extends CharType
-case object SwiftCharType extends CharType
-case object EdifactCharType extends CharType
-case object InfoServiceCharType extends CharType
+case class FixLengthRule(length: Int) extends Sfv4jRule {
+  override def filter: String => Boolean = s => s.length == length
+}
 
-case class CharRule(lr: LengthRestriction, ct: CharType) extends Sfv4jRule
+case class MultiLineRule(lines: Int, length: Int) extends Sfv4jRule {
+  override def filter: String => Boolean = s => s.length <= lines * length
+}
 
-case object OptionalRule extends Sfv4jRule
+case object NumericDigitRule extends Sfv4jRule {
+  override def filter: String => Boolean = s => Try(s.toLong).isSuccess
+}
 
-case object EmptyRule extends Sfv4jRule
+case object AlphaLetterRule extends Sfv4jRule {
+  override def filter: String => Boolean = s => true
+}
+
+case object AnyLetterRule extends Sfv4jRule {
+  override def filter: String => Boolean = s => true
+}
+
+case object HexLetterRule extends Sfv4jRule {
+  override def filter: String => Boolean = s => true
+}
+
+case object SwiftCharRule extends Sfv4jRule {
+  override def filter: String => Boolean = s => true
+}
+
+case object EdifactCharRule extends Sfv4jRule {
+  override def filter: String => Boolean = s => true
+}
+
+case object InfoServiceCharRule extends Sfv4jRule {
+  override def filter: String => Boolean = s => true
+}
+
+case object OptionalRule extends Sfv4jRule {
+  override def validate(obj: Any): Result = Right(true)
+}
+
+case object EmptyRule extends Sfv4jRule {
+  override def validate(obj: Any): Result =
+    Either.cond(obj == null, true, ValidationError(s"not null arg: $obj"))
+}
