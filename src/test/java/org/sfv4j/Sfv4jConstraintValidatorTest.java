@@ -1,6 +1,7 @@
 package org.sfv4j;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +15,7 @@ import java.util.Set;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
+@Ignore
 public class Sfv4jConstraintValidatorTest {
     private static final Logger LOG = LoggerFactory.getLogger(Sfv4jConstraintValidatorTest.class);
 
