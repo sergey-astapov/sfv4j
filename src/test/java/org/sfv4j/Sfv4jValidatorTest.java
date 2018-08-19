@@ -10,7 +10,7 @@ import static org.junit.Assert.assertThat;
 public class Sfv4jValidatorTest {
     private static final Logger LOG = LoggerFactory.getLogger(Sfv4jValidatorTest.class);
 
-    private static Sfv4jValidator validator = new Sfv4jValidator();
+    private static Sfv4jValidator validator = new Sfv4jValidator(new Sfv4jCompiler());
 
     @Test
     public void test() {

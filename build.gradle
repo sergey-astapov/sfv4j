@@ -23,7 +23,6 @@ allprojects {
     def scalaMinor = '4'
     def scalaCombVersion = '1.1.1'
     def validationVersion = '2.0.0.Final'
-    def hibernateVersion = '6.0.7.Final'
     def logbackVersion = '1.1.7'
     def slf4jVersion = '1.7.22'
 
@@ -32,8 +31,6 @@ allprojects {
                 "org.scala-lang:scala-library:$scalaMajor.$scalaMinor",
                 "org.scala-lang.modules:scala-parser-combinators_$scalaMajor:$scalaCombVersion",
                 "javax.validation:validation-api:$validationVersion",
-                "org.hibernate.validator:hibernate-validator:$hibernateVersion",
-                "org.glassfish:javax.el:3.0.1-b08",
                 "ch.qos.logback:logback-core:$logbackVersion",
                 "ch.qos.logback:logback-classic:$logbackVersion",
                 "org.slf4j:slf4j-api:$slf4jVersion"
@@ -47,6 +44,20 @@ allprojects {
 
     task wrapper(type: Wrapper) {
         gradleVersion = '3.5'
+    }
+
+    sourceSets {
+        main {
+            scala {
+                srcDirs = [
+                        'src/main/scala',
+                        'src/main/java'
+                ]
+            }
+            java {
+                srcDirs = []
+            }
+        }
     }
 
     jar {

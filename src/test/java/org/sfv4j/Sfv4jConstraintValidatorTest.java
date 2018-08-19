@@ -1,37 +1,35 @@
 package org.sfv4j;
 
-import org.junit.BeforeClass;
-import org.junit.Ignore;
+import org.junit.Before;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import sun.reflect.annotation.AnnotationParser;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
-@Ignore
 public class Sfv4jConstraintValidatorTest {
-    private static final Logger LOG = LoggerFactory.getLogger(Sfv4jConstraintValidatorTest.class);
+    private Sfv4jConstraintValidator validator;
 
-    private static Validator validator;
-
-    @BeforeClass
-    public static void setUp() {
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        validator = factory.getValidator();
+    @Before
+    public void before() {
+        validator = new Sfv4jConstraintValidator();
     }
 
     @Test
-    public void test() {
-        Set<ConstraintViolation<TestField>> set = validator.validate(new TestField(null));
-        set.forEach(v -> LOG.info(v.toString()));
+    public void test2n() {
+        validator.initialize(annotation("2n"));
+        assertThat(validator.isValid(null, null), is(false));
+        assertThat(validator.isValid(1, null), is(true));
+        assertThat(validator.isValid("11", null), is(true));
+        assertThat(validator.isValid(111, null), is(false));
+    }
 
-        assertThat(set.size(), is(0));
+    private static Sfv4j annotation(String specs) {
+        Map<String, Object> values = new HashMap<>();
+        values.put("value", specs);
+        return (Sfv4j) AnnotationParser.annotationForMap(Sfv4j.class, values);
     }
 }
