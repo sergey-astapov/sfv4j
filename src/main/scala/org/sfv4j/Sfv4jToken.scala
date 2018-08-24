@@ -12,7 +12,7 @@ case object RangeLengthToken extends Sfv4jToken
 
 case object MultiLineToken extends Sfv4jToken
 
-case class DateToken(value: Int) extends Sfv4jToken
+case class DateToken(format: DateFmt) extends Sfv4jToken
 
 case object NumericDigitToken extends Sfv4jToken
 

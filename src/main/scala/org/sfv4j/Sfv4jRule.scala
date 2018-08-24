@@ -1,5 +1,10 @@
 package org.sfv4j
 
+import java.time.MonthDay
+import java.time.format.DateTimeFormatter
+import java.time.temporal.TemporalAccessor
+import java.util.Locale
+
 import scala.util.Try
 
 sealed trait Sfv4jRule {
@@ -26,8 +31,28 @@ case class AndThenRule(r1: Sfv4jRule, r2: Sfv4jRule) extends Sfv4jRule {
   }
 }
 
-case class DateRule(value: Int) extends Sfv4jRule {
-  override def filter: String => Boolean = s => s.length == value
+sealed trait DateFmt {
+  val pattern: String
+}
+
+case object DateFmt4 extends DateFmt {
+  override val pattern = "MMdd"
+}
+
+case object DateFmt6 extends DateFmt {
+  override val pattern = "yyMMdd"
+}
+
+case object DateFmt8 extends DateFmt {
+  override val pattern = "yyyyMMdd"
+}
+
+case class DateRule(format: DateFmt) extends Sfv4jRule {
+  override def filter: String => Boolean = s => Try {
+    DateTimeFormatter
+      .ofPattern(format.pattern, Locale.ENGLISH)
+      .parse(s, (ta: TemporalAccessor) => MonthDay.from(ta))
+  }.isSuccess
 }
 
 case class MaxLengthRule(max: Int) extends Sfv4jRule {

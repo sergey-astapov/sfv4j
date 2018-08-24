@@ -35,11 +35,11 @@ object Sfv4jLexer extends RegexParsers {
 
   private def optional: Parser[Sfv4jToken] = "?" ^^ (_ => OptionalToken)
 
-  private def dateOf4: Parser[Sfv4jToken] = "4!n" ^^ (_ => DateToken(4))
+  private def dateOf4: Parser[Sfv4jToken] = "MMDD" ^^ (_ => DateToken(DateFmt4))
 
-  private def dateOf6: Parser[Sfv4jToken] = "4!n" ^^ (_ => DateToken(6))
+  private def dateOf6: Parser[Sfv4jToken] = "YYMMDD" ^^ (_ => DateToken(DateFmt6))
 
-  private def dateOf8: Parser[Sfv4jToken] = "4!n" ^^ (_ => DateToken(8))
+  private def dateOf8: Parser[Sfv4jToken] = "YYYYMMDD" ^^ (_ => DateToken(DateFmt8))
 
   private def date: Parser[Sfv4jToken] = dateOf4 | dateOf6 | dateOf8
 

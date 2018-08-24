@@ -23,6 +23,18 @@ class Sfv4jLexerTest extends FunSuite {
     )(Sfv4jLexer("16-64h"))
   }
 
+  test("MMDD") {
+    assertResult(Right(List(DateToken(DateFmt4))))(Sfv4jLexer("MMDD"))
+  }
+
+  test("YYMMDD") {
+    assertResult(Right(List(DateToken(DateFmt6))))(Sfv4jLexer("YYMMDD"))
+  }
+
+  test("YYYYMMDD") {
+    assertResult(Right(List(DateToken(DateFmt8))))(Sfv4jLexer("YYYYMMDD"))
+  }
+
   test("Empty") {
     assertResult(Right(List(EmptyToken)))(Sfv4jLexer("e"))
   }

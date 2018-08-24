@@ -24,7 +24,7 @@ object Sfv4jRuleParser extends Parsers {
     case dt @ DateToken(_) => dt
   })
 
-  private def date = dateToken ^^ (dt => DateRule(dt.value))
+  private def date = dateToken ^^ (dt => DateRule(dt.format))
 
   private def lengthToken = accept("length", {
     case lt @ LengthToken(_) => lt
