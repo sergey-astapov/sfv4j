@@ -26,6 +26,7 @@ class Sfv4jValidator(compiler: Sfv4jCompiler) {
   def validateField(obj: Any, spec: String): Sfv4jResult = compiler.compile(spec)
     .flatMap(r => r.validate(obj)) match {
     case Right(true) => Sfv4jSuccess
+    case Right(false) => Sfv4jFailure(s"'$spec' failed, obj: $obj")
     case Left(e) => Sfv4jFailure(e.toString)
   }
 
