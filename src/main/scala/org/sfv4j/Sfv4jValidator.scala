@@ -11,16 +11,17 @@ case object Sfv4jSuccess extends Sfv4jResult
 case class Sfv4jFailure(msg: String) extends Sfv4jResult
 
 class Sfv4jValidator(compiler: Sfv4jCompiler) {
-  def validate(obj: Any): Sfv4jResult = {
-    val errors = obj.getClass.getDeclaredFields
-      .map(f => {
-        f.setAccessible(true)
-        f
-      })
-      .filter(f => f.isAnnotationPresent(classOf[Sfv4j]))
-      .map(f => compiler.compile(key(f)).flatMap(r => r.validate(f.get(obj))))
-      .flatMap(_.left.toOption).toList
-    if (errors.isEmpty) Sfv4jSuccess else Sfv4jFailure(errors.reduce((e1, e2) => e1 + e2).toString)
+  def validate(obj: Any): Sfv4jResult = obj.getClass.getDeclaredFields
+    .map(f => {
+      f.setAccessible(true)
+      f
+    })
+    .filter(f => f.isAnnotationPresent(classOf[Sfv4j]))
+    .map(f => compiler.compile(key(f)).flatMap(r => r.validate(f.get(obj))))
+    .flatMap(_.left.toOption)
+    .toList match {
+    case Nil => Sfv4jSuccess
+    case errors => Sfv4jFailure(errors.reduce((e1, e2) => e1 + e2).toString)
   }
 
   def validateField(obj: Any, spec: String): Sfv4jResult = compiler.compile(spec)
