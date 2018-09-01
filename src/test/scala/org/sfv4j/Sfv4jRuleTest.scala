@@ -32,4 +32,40 @@ class Sfv4jRuleTest extends FunSuite {
       Left(ValidationError("DateRule(DateFmt8) failed, arg: 20181232"))
     )(DateRule(DateFmt8).validate(20181232))
   }
+
+  test("up to 4 lines of up to 5 characters") {
+    assertResult(
+      Right(true)
+    )(MultiLineRule(4, 5).validate(
+      """12345
+        |qwert
+        |asdfg
+        |zxcvb""".stripMargin))
+  }
+
+  test("up to 3 lines of up to 5 characters - lines number error") {
+    assertResult(
+      Left(ValidationError(
+        """MultiLineRule(3,5) failed, arg: 12345
+          |qwert
+          |asdfg
+          |zxcvb""".stripMargin))
+    )(MultiLineRule(3, 5).validate(
+      """12345
+        |qwert
+        |asdfg
+        |zxcvb""".stripMargin))
+  }
+
+  test("up to 3 lines of up to 5 characters - line length error") {
+    assertResult(
+      Left(ValidationError(
+        """MultiLineRule(3,5) failed, arg: 12345
+          |qwerty
+          |asdfg""".stripMargin))
+    )(MultiLineRule(3, 5).validate(
+      """12345
+        |qwerty
+        |asdfg""".stripMargin))
+  }
 }

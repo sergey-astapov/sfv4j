@@ -56,7 +56,7 @@ case class DateRule(format: DateFmt) extends Sfv4jRule {
 }
 
 case class MaxLengthRule(max: Int) extends Sfv4jRule {
-  override def filter: String => Boolean = s => s.length <= max
+  override def filter: String => Boolean = s => s.length >= 1 && s.length <= max
 }
 
 case class RangeLengthRule(min: Int, max: Int) extends Sfv4jRule {
@@ -68,7 +68,10 @@ case class FixLengthRule(length: Int) extends Sfv4jRule {
 }
 
 case class MultiLineRule(lines: Int, length: Int) extends Sfv4jRule {
-  override def filter: String => Boolean = s => s.length <= lines * length
+  override def filter: String => Boolean = s => {
+    val list = s.split("\\r?\\n")
+    list.size <= lines && !list.exists(l => l.length > length)
+  }
 }
 
 case object NumericDigitRule extends Sfv4jRule {
