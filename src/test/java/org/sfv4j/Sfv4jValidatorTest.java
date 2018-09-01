@@ -14,8 +14,11 @@ public class Sfv4jValidatorTest {
 
     @Test
     public void test() {
-        Sfv4jResult res = validator.validate(new TestField(null));
-        LOG.info("{}", res);
+        User user = new User(null, null, null);
+        Sfv4jResult res = validator.validate(user);
+        LOG.info("res: {}", res);
         assertThat(res.isSuccess(), is(false));
+        Sfv4jFailure failure = (Sfv4jFailure)res;
+        assertThat(failure.msg().isEmpty(), is(false));
     }
 }
